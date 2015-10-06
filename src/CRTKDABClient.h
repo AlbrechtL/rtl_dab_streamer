@@ -29,9 +29,22 @@ public:
 	CRTKDABClient(std::string ServerIPAdress, int ServerPort);
 	virtual ~CRTKDABClient();
 
+	void OpenDevice(void);
+	void CloseDevice(void);
+
+	void Start(void);
+	void Stop(void);
+
 	void AddServiceCom(int ParaMode, int ID, int StartCU, int U_E, int Index, int EEPIdx, int CUNum, int PacketAddr, int FEC);
 	void DelServiceCom(int ParaMode, int ID, int PacketAddr);
 	void SetFreq(int Frequency);
+
+	int GetFreqAndBW(void);
+	int GetSignalQuality(void);
+	int GetSignalLock(void);
+	int GetSignalPresent(void);
+	int GetSignalStrength(void);
+	int GetTunerRange(void);
 
 private:
 	anyrpc::Client* pMessagePackRPC_Client;

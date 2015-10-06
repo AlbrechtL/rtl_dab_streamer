@@ -32,6 +32,56 @@ CRTKDABClient::~CRTKDABClient()
 {
 }
 
+void CRTKDABClient::OpenDevice(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	params[0] = 0;
+	success = pMessagePackRPC_Client->Call("OpenDevice", params, result);
+
+	std::cout << "OpenDevice: success: " <<  success << " result: " << result << std::endl;
+}
+
+void CRTKDABClient::CloseDevice(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	params[0] = 0;
+	success = pMessagePackRPC_Client->Call("CloseDevice", params, result);
+
+	std::cout << "CloseDeviceCloseDevice: success: " <<  success << " result: " << result << std::endl;
+}
+
+
+void CRTKDABClient::Start(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	params[0] = 0;
+	success = pMessagePackRPC_Client->Call("Start", params, result);
+
+	std::cout << "Start: success: " <<  success << " result: " << result << std::endl;
+}
+
+void CRTKDABClient::Stop(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	params[0] = 0;
+	success = pMessagePackRPC_Client->Call("Stop", params, result);
+
+	std::cout << "Stop: success: " <<  success << " result: " << result << std::endl;
+}
+
+
 void CRTKDABClient::AddServiceCom(int ParaMode, int ID, int StartCU, int U_E, int Index, int EEPIdx, int CUNum, int PacketAddr, int FEC)
 {
 	anyrpc::Value params;
@@ -83,3 +133,91 @@ void CRTKDABClient::SetFreq(int Frequency)
 	std::cout << "SetFreq: success: " <<  success << " result: " << result << std::endl;
 
 }
+
+int CRTKDABClient::GetFreqAndBW(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	success = pMessagePackRPC_Client->Call("GetFreqAndBW", params, result);
+
+	std::cout << "GetFreqAndBW: success: " <<  success << " result: " << result << std::endl;
+
+	return 0;
+}
+
+int CRTKDABClient::GetSignalQuality(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	success = pMessagePackRPC_Client->Call("GetSignalQuality", params, result);
+
+	std::cout << "GetSignalQuality: success: " <<  success << " result: " << result << std::endl;
+
+	return 0;
+}
+
+int CRTKDABClient::GetSignalLock(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	params.SetArray();
+	params[0] = 0;
+
+	success = pMessagePackRPC_Client->Call("GetSignalLock", params, result);
+
+	std::cout << "GetSignalLock: success: " <<  success << " result: " << result << std::endl;
+
+	if(success)
+	{
+		if(result.IsInt())
+			return result.GetInt();
+	}
+
+	return -1;
+}
+
+int CRTKDABClient::GetSignalPresent(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	success = pMessagePackRPC_Client->Call("GetSignalPresent", params, result);
+
+	std::cout << "GetSignalPresent: success: " <<  success << " result: " << result << std::endl;
+
+	return 0;
+}
+
+int CRTKDABClient::GetSignalStrength(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	success = pMessagePackRPC_Client->Call("GetSignalStrength", params, result);
+
+	std::cout << "GetSignalStrength: success: " <<  success << " result: " << result << std::endl;
+
+	return 0;
+}
+
+int CRTKDABClient::GetTunerRange(void)
+{
+	anyrpc::Value params;
+	anyrpc::Value result;
+	bool success;
+
+	success = pMessagePackRPC_Client->Call("GetTunerRange", params, result);
+
+	std::cout << "GetTunerRange: success: " <<  success << " result: " << result << std::endl;
+
+	return 0;
+}
+

@@ -17,6 +17,7 @@
  */
 
 #include <iostream>
+#include <unistd.h>
 
 #include "dabplus_decoder.h"
 #include "fic_decoder.h"
@@ -32,6 +33,7 @@ using namespace std;
 
 int main()
 {
+	// Setup objects
 	CWAVStreamer WAVStreamer;
 	CHTTPServer HTTPServer(&WAVStreamer);
 	CProcessPCMData ProcessPCMData(&WAVStreamer);
@@ -40,6 +42,7 @@ int main()
 	FICDecoder DABFICDecoder(&FIC);
 	CRTKDABServer RTKDABServer(9000, &DABPlusDecoder, &DABFICDecoder);
 	CRTKDABClient RTKDABClient("127.0.0.1", 8778);
+	//CRTKDABClient RTKDABClient("127.0.0.1", 8778);
 
 	WAVStreamer.SetRTKDABClient(&RTKDABClient);
 	WAVStreamer.SetFICDecoder(&DABFICDecoder);
@@ -51,8 +54,8 @@ int main()
     do
     {
     	c = 0;
-        cin >> c;
-    	//fgets(&c, 1, stdin);
+        //cin >> c;
+    	fgets(&c, 1, stdin);
     	//fprintf(stderr,"test %s\n",&c);
 		if (c == 'c')
 		{
@@ -79,6 +82,8 @@ int main()
 			RTKDABClient.AddServiceCom(0, 7, 360, 1, 0, 2, 72, 0, 2);
 			fprintf(stderr,"End x\n");
 		}
+
+		usleep(100000); // Very ugly.
 
     } while (c != 'q');
 

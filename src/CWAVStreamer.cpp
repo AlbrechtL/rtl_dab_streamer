@@ -24,6 +24,9 @@
 #include "CWAVStreamer.h"
 #include "tools.h"
 
+#define TIMEOUT_S 10
+#define WAIT_US 100000
+
 CWAVStreamer::CWAVStreamer()
 {
 	RTKDABClient = NULL;
@@ -38,11 +41,17 @@ CWAVStreamer::~CWAVStreamer()
 
 int CWAVStreamer::Connected(void)
 {
+	RTKDABClient->OpenDevice();
+	RTKDABClient->Start();
+
 	return 0;
 }
 
 int CWAVStreamer::Disconnected(void)
 {
+	RTKDABClient->Stop();
+	RTKDABClient->CloseDevice();
+
 	return 0;
 }
 
@@ -131,6 +140,8 @@ void CWAVStreamer::SetFICDecoder(FICDecoder *DABFICDecoder_)
 
 void CWAVStreamer::ProcessURL(std::string Channel, std::string SID)
 {
+	uint32_t Timeout = 0;
+
 	uint16_t iSID = std::stoul(SID, nullptr, 16);
 
 	std::cout << "Channel: " << Channel<< ", SID: " << SID << std::endl;
@@ -160,33 +171,54 @@ void CWAVStreamer::ProcessURL(std::string Channel, std::string SID)
 			CurrentFrequency = Frequency;
 		}
 
-		// Wait 3s
-		usleep(3000000); // Very ugly. It is better is to wait for RTKDAB_Interface that the radio signal is available
-
-		// Get available DAB channels
-		services_t new_services = DABFICDecoder->GetServices();
-
-		// Find audio service in database
-		for (auto &any : new_services) // TODO Maybe to use of find is better
+		// *** Wait for the signal and for the channel information ***
+		bool foundChannel = false;
+		while(!foundChannel)
 		{
-			if(any.sid == iSID) // Found it
+			// Get the signal status
+			int isSignal = RTKDABClient->GetSignalLock();
+
+			if (isSignal == 1) // Signal is available
 			{
-				std::cout << "SID detected" << std::endl;
+				// Get available DAB channels
+				services_t new_services = DABFICDecoder->GetServices();
 
-				uint8_t subchid = any.subchannel.subchid;
-				uint16_t  StartCU = any.subchannel.StartCU; // CU start address
-				uint8_t U_E = any.subchannel.U_E; // UEP or EEP
-				uint8_t EEPProtectionLevel = any.subchannel.EEPProtectionLevel;
-				uint8_t SubChannelSize = any.subchannel.SubChannelSize;
+				// Find audio service in database
+				for (auto &any : new_services) // TODO Maybe to use of find is better
+				{
+					if(any.sid == iSID) // Found it
+					{
+						std::cout << "SID detected" << std::endl;
 
-				// Delete old channel
-				// int ParaMode, int ID, int PacketAddr
-				//RTKDABClient->DelServiceCom(0,CurrentID,0);
+						uint8_t subchid = any.subchannel.subchid;
+						uint16_t  StartCU = any.subchannel.StartCU; // CU start address
+						uint8_t U_E = any.subchannel.U_E; // UEP or EEP
+						uint8_t EEPProtectionLevel = any.subchannel.EEPProtectionLevel;
+						uint8_t SubChannelSize = any.subchannel.SubChannelSize;
 
-				// int ParaMode, int ID, int StartCU, int U_E, int Index, int EEPIdx, int CUNum, int PacketAddr, int FEC
-				RTKDABClient->AddServiceCom(0, subchid, StartCU, U_E, 0, EEPProtectionLevel, SubChannelSize, 0, 2);
-				CurrentID = subchid;
+						// Delete old channel
+						// int ParaMode, int ID, int PacketAddr
+						//RTKDABClient->DelServiceCom(0,CurrentID,0);
+
+						// int ParaMode, int ID, int StartCU, int U_E, int Index, int EEPIdx, int CUNum, int PacketAddr, int FEC
+						RTKDABClient->AddServiceCom(0, subchid, StartCU, U_E, 0, EEPProtectionLevel, SubChannelSize, 0, 2);
+						CurrentID = subchid;
+
+						foundChannel = true;
+					}
+				}
 			}
+
+			Timeout += WAIT_US;
+			if(Timeout >= TIMEOUT_S * 1000000)
+			{
+				std::cout << "Signal Timeout " << std::endl;
+
+				break;
+			}
+
+			// Wait 100 ms
+			usleep(WAIT_US);
 		}
 	}
 }
