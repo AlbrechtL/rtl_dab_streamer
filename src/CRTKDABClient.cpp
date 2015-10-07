@@ -38,7 +38,7 @@ void CRTKDABClient::OpenDevice(void)
 	anyrpc::Value result;
 	bool success;
 
-	params[0] = 0;
+	params.SetNull();
 	success = pMessagePackRPC_Client->Call("OpenDevice", params, result);
 
 	std::cout << "OpenDevice: success: " <<  success << " result: " << result << std::endl;
@@ -50,10 +50,10 @@ void CRTKDABClient::CloseDevice(void)
 	anyrpc::Value result;
 	bool success;
 
-	params[0] = 0;
+	params.SetNull();
 	success = pMessagePackRPC_Client->Call("CloseDevice", params, result);
 
-	std::cout << "CloseDeviceCloseDevice: success: " <<  success << " result: " << result << std::endl;
+	std::cout << "CloseDevice: success: " <<  success << " result: " << result << std::endl;
 }
 
 
@@ -63,7 +63,7 @@ void CRTKDABClient::Start(void)
 	anyrpc::Value result;
 	bool success;
 
-	params[0] = 0;
+	params.SetNull();
 	success = pMessagePackRPC_Client->Call("Start", params, result);
 
 	std::cout << "Start: success: " <<  success << " result: " << result << std::endl;
@@ -75,7 +75,7 @@ void CRTKDABClient::Stop(void)
 	anyrpc::Value result;
 	bool success;
 
-	params[0] = 0;
+	params.SetNull();
 	success = pMessagePackRPC_Client->Call("Stop", params, result);
 
 	std::cout << "Stop: success: " <<  success << " result: " << result << std::endl;
@@ -166,8 +166,7 @@ int CRTKDABClient::GetSignalLock(void)
 	anyrpc::Value result;
 	bool success;
 
-	params.SetArray();
-	params[0] = 0;
+	params.SetNull();
 
 	success = pMessagePackRPC_Client->Call("GetSignalLock", params, result);
 

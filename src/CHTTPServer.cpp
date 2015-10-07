@@ -74,8 +74,8 @@ CHTTPServer::CHTTPServer(CHTTPContentProvider *pHTTPContentProvider)
 	if (bind(SocketDesc, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 		fprintf(stderr, "Failed to bind\n");
 
-	// Allow 5 connections
-	listen(SocketDesc, 5);
+	// Allow 1 connections
+	listen(SocketDesc, 1);
 
 	// Start connection thread
 	HTTPThread = new std::thread(CHTTPServer::ConnectionThreadWrapper,this);  // spawn new thread that calls bar(0)
