@@ -27,6 +27,28 @@
 #define TIMEOUT_S 10
 #define WAIT_US 100000
 
+// WAVE File Header
+typedef struct
+{
+	// RIFF chunk descriptor
+	char ChunkID[4];				// "RIFF"
+	int ChunkSize;					// 4 + (8 + SubChunk1Size) + (8 + SubChunk2Size)
+	char Format[4];					// "WAVE"
+	// fmt sub-chunk
+	char Subchunk1ID[4];			// "fmt "
+	int Subchunk1Size;				// bytes remaining in subchunk, 16 if uncompressed
+	short AudioFormat;				// 1 = uncompressed
+	short NumChannels;				// mono or stereo
+	int SampleRate;
+	int ByteRate;					// == SampleRate * NumChannels * BitsPerSample/8
+	short BlockAlign;				// == NumChannels * BitsPerSample/8
+	short BitsPerSample;
+	// data sub-chunk
+	char Subchunk2ID[4];			// "data"
+	int Subchunk2Size;				// == NumSamples * NumChannels * BitsPerSample/8
+} WAVHeaderInfo_t;
+
+
 CWAVStreamer::CWAVStreamer()
 {
 	RTKDABClient = NULL;
@@ -97,14 +119,22 @@ int CWAVStreamer::GETResponse(std::vector<std::string> URLPartList)
     0x0d,0x0a,0x0d,0x0a
     };
 
-	// TODO: Update the WAV-header
-	// 0x18 is sample rate, 0x1c is rate * channels * bytes per sample
-	uint8_t WAVHeaderStereo[] =
-    {
-    0x52,0x49, 0x46,0x46, 0x64,0x19, 0xff,0x7f, 0x57,0x41, 0x56,0x45, 0x66,0x6d, 0x74,0x20,
-    0x10,0x00, 0x00,0x00, 0x01,0x00, 0x02,0x00, 0x80,0xbb, 0x00,0x00, 0x80,0xbb, 0x00,0x00,
-    0x02,0x00, 0x10,0x00, 0x64,0x61, 0x74,0x61, 0x40,0x19, 0xff,0x7f, 0x00,0x00, 0x00,0x00
-    };
+	WAVHeaderInfo_t WAVHeaderStereo =
+	{
+			{'R','I','F','F'}, // ChunkID
+			2147424612, // ChunkSize
+			{'W','A','V','E'}, // Format
+			{'f','m','t',' '}, // Subchunk1ID
+			16, // Subchunk1Size
+			1, // AudioFormat
+			2, // NumChannels
+			48000, // SampleRate
+			192000, // ByteRate
+			4, // BlockAlign
+			16, // BitsPerSample
+			{'d','a','t','a'}, // Subchunk2ID
+			2147424579 // Subchunk2Size
+	};
 
 	if(URLPartList.size() == 2)
 		ProcessURL(URLPartList.at(0), URLPartList.at(1));
@@ -114,7 +144,7 @@ int CWAVStreamer::GETResponse(std::vector<std::string> URLPartList)
     if(HTTPServer)
     {
     	HTTPServer->Send(StreamStart, sizeof(StreamStart));
-    	HTTPServer->Send(WAVHeaderStereo, sizeof(WAVHeaderStereo));
+    	HTTPServer->Send((uint8_t*)&WAVHeaderStereo, sizeof(WAVHeaderStereo));
     }
 
 	return 0;
