@@ -22,7 +22,6 @@
 
 #include "dabplus_decoder.h"
 
-#define ANYRPC_THREADING
 #include <anyrpc/anyrpc.h>
 #include "CMSCCallback.h"
 #include "CFICCallback.h"
@@ -30,7 +29,7 @@
 class CRTKDABServer
 {
 public:
-	CRTKDABServer(int Port, SuperframeFilter *DABPlusDecoder, FICDecoder* DABFICDecoder);
+	CRTKDABServer(int ListenPort, SuperframeFilter *DABPlusDecoder, FICDecoder* DABFICDecoder);
 	virtual ~CRTKDABServer();
 
 private:

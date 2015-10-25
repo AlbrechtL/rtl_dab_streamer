@@ -18,13 +18,13 @@
 
 #include "CRTKDABServer.h"
 
-CRTKDABServer::CRTKDABServer(int Port, SuperframeFilter *DABPlusDecoder, FICDecoder* DABFICDecoder)
+CRTKDABServer::CRTKDABServer(int ListenPort, SuperframeFilter *DABPlusDecoder, FICDecoder* DABFICDecoder)
 {
 	// New message pack TCP server with threading
 	MessagePack_Server = new anyrpc::MessagePackTcpServerTP;
 
 	// Bind to port
-	MessagePack_Server->BindAndListen(Port);
+	MessagePack_Server->BindAndListen(ListenPort);
 
 	// Add the method calls
 	MethodManager = MessagePack_Server->GetMethodManager();

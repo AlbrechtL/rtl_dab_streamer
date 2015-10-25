@@ -121,19 +121,19 @@ int CWAVStreamer::GETResponse(std::vector<std::string> URLPartList)
 
 	WAVHeaderInfo_t WAVHeaderStereo =
 	{
-			{'R','I','F','F'}, // ChunkID
-			2147424612, // ChunkSize
-			{'W','A','V','E'}, // Format
-			{'f','m','t',' '}, // Subchunk1ID
-			16, // Subchunk1Size
-			1, // AudioFormat
-			2, // NumChannels
-			48000, // SampleRate
-			192000, // ByteRate
-			4, // BlockAlign
-			16, // BitsPerSample
-			{'d','a','t','a'}, // Subchunk2ID
-			2147424579 // Subchunk2Size
+		{'R','I','F','F'}, // ChunkID
+		2147424612, // ChunkSize
+		{'W','A','V','E'}, // Format
+		{'f','m','t',' '}, // Subchunk1ID
+		16, // Subchunk1Size
+		1, // AudioFormat
+		2, // NumChannels
+		48000, // SampleRate
+		192000, // ByteRate
+		4, // BlockAlign
+		16, // BitsPerSample
+		{'d','a','t','a'}, // Subchunk2ID
+		2147424579 // Subchunk2Size
 	};
 
 	if(URLPartList.size() == 2)
